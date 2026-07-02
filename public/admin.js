@@ -173,7 +173,8 @@
             <div class="sub">Respostas e estatísticas em tempo real</div>
           </div>
           <div class="tools">
-            <span class="chip live">● ao vivo · atualiza 15s</span>
+            <span class="chip live">ao vivo · atualiza 15s</span>
+            <button class="icon-btn" id="fs">⛶ Ecrã inteiro</button>
             <button class="icon-btn" id="refresh">Atualizar</button>
             <button class="icon-btn" id="logout">Sair</button>
           </div>
@@ -202,6 +203,14 @@
         <div class="card panel-c">${recent}</div>
       </div>`;
 
+    document.getElementById("fs").onclick = () => {
+      if (!document.fullscreenElement) {
+        (document.documentElement.requestFullscreen ||
+          document.documentElement.webkitRequestFullscreen)?.call(document.documentElement);
+      } else {
+        (document.exitFullscreen || document.webkitExitFullscreen)?.call(document);
+      }
+    };
     document.getElementById("refresh").onclick = load;
     document.getElementById("logout").onclick = () => {
       localStorage.removeItem(KEY);

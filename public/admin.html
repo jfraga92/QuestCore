@@ -12,7 +12,7 @@
     />
     <link rel="stylesheet" href="/theme.css" />
     <style>
-      .dash { max-width: 1120px; margin: 0 auto; padding: 24px 20px 60px; }
+      .dash { max-width: 1180px; margin: 0 auto; padding: 24px 20px 60px; }
       .head { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 26px; animation: fadeUp 0.5s ease both; }
       .head h1 { font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; margin: 0; letter-spacing: -0.01em; color: var(--ink); }
       .head .sub { color: var(--muted); font-size: 0.92rem; margin-top: 2px; }
@@ -82,6 +82,47 @@
       .gate input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(1,104,255,0.12); }
       .gate .err { color: #ef4444; font-size: 0.85rem; min-height: 20px; margin-bottom: 8px; font-weight: 600; }
       .empty { text-align: center; color: var(--muted); padding: 40px; }
+
+      /* ---- Modo projeção (PC / ecrã grande, landscape) ---- */
+      @media (min-width: 1200px) {
+        .dash { max-width: min(1720px, 97vw); padding: 26px 40px 60px; }
+        .head h1 { font-size: 2.3rem; }
+        .head .sub { font-size: 1.05rem; }
+        .chip { font-size: 0.82rem; padding: 10px 15px; }
+        .icon-btn { font-size: 1rem; padding: 11px 18px; }
+
+        .kpis { gap: 20px; }
+        .kpi { padding: 22px 24px; }
+        .kpi .n { font-size: 3.8rem; }
+        .kpi .t { font-size: 0.82rem; }
+        .kpi .pct { font-size: 0.95rem; }
+
+        /* Primeira dobra: KPIs + mapa + distribuição ocupam ~um ecrã */
+        .cols { grid-template-columns: 1.15fr 1fr; gap: 22px; }
+        .panel-c { padding: 26px; }
+        .panel-c h3 { font-size: 0.86rem; margin-bottom: 20px; }
+        .map { max-height: 58vh; width: auto; margin: 0 auto; }
+
+        .distro { gap: 20px; }
+        .distro .r .top { font-size: 1.12rem; margin-bottom: 8px; }
+        .distro .track { height: 18px; }
+        .distro .r .top .sym { font-size: 1.2rem; }
+
+        .avg .a .lab { font-size: 1.05rem; }
+        .avg .track { height: 15px; }
+
+        .section-title { font-size: 0.86rem; margin: 40px 0 8px; }
+        .questions { grid-template-columns: repeat(5, 1fr); gap: 18px; }
+        .qcard { padding: 18px; }
+        .qcard .qt { font-size: 1rem; }
+        th, td { font-size: 1.02rem; padding: 14px 12px; }
+      }
+
+      @media (min-width: 1200px) and (max-width: 1500px) {
+        .questions { grid-template-columns: repeat(3, 1fr); }
+      }
+
+      :fullscreen .dash, :-webkit-full-screen .dash { padding-top: 30px; }
     </style>
   </head>
   <body>
