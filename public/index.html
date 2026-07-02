@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Questionário</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="card">
+      <header>
+        <h1 id="title">A carregar…</h1>
+        <p id="description" class="muted"></p>
+      </header>
+
+      <form id="form" novalidate hidden>
+        <div id="questions"></div>
+        <p id="error" class="error" hidden></p>
+        <button type="submit" id="submit">Enviar respostas</button>
+      </form>
+
+      <div id="thanks" class="thanks" hidden>
+        <div class="check">✓</div>
+        <h2>Obrigado!</h2>
+        <p class="muted">A tua resposta foi registada com sucesso.</p>
+        <button type="button" id="again" class="secondary">Responder novamente</button>
+      </div>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

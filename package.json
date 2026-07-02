@@ -1,0 +1,19 @@
+{
+  "name": "questionario-web",
+  "version": "1.0.0",
+  "description": "Questionário web com respostas guardadas no Supabase",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0"
+  }
+}
