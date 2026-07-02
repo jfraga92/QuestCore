@@ -1,66 +1,57 @@
-# Questionário Web
+# A Tua Rota · inCentea Core
 
-Questionário web simples (HTML + Express) que guarda as respostas no **Supabase**.
-Pronto a publicar no **GitHub** e no **Railway**.
+Questionário interativo **mobile-first** para uma sessão de equipa da inCentea Core
+sobre a transformação com IA e o perfil "AI Engineer". Os participantes entram por
+**QR code**, respondem a 10 sinais e recebem o seu perfil (Pioneiro/Curioso/Guardião/
+Observador), mapa, eixos e SWOT pessoal. As respostas ficam guardadas no **Supabase**
+e há um **painel de administração** com estatísticas.
 
-- Formulário gerado dinamicamente a partir de [`questions.js`](questions.js) — editas um ficheiro e o formulário muda.
-- As chaves do Supabase ficam **só no servidor** (nunca expostas ao browser).
-- Endpoint protegido para consultar respostas.
+## Páginas
 
-## 1. Configurar o Supabase
+| Rota | O que é |
+|---|---|
+| `/` | **Landing** para projetar na sala, com o QR code de acesso |
+| `/quiz` | O **questionário** (mobile-first): nome → 10 sinais → resultado |
+| `/admin` | **Painel** de respostas e estatísticas (protegido por token) |
 
-1. No [Supabase Dashboard](https://supabase.com/dashboard), abre o teu projeto.
-2. Vai a **SQL Editor → New query**, cola o conteúdo de [`supabase/schema.sql`](supabase/schema.sql) e carrega em **Run**.
-3. Vai a **Project Settings → API** e copia:
-   - **Project URL** → `SUPABASE_URL`
-   - **service_role** (secret) → `SUPABASE_SERVICE_ROLE_KEY`
+## Stack
 
-## 2. Correr localmente
+- Node.js + Express (servidor), HTML/CSS/JS puro (sem framework)
+- Supabase (Postgres) para guardar as respostas
+- QR code gerado no servidor (`qrcode`)
+- Tipografia Syne / DM Sans / DM Mono · identidade escura + verde-lima inCentea
+
+## Variáveis de ambiente
+
+Copia `.env.example` para `.env` (local) ou define no Railway:
+
+| Nome | Descrição |
+|---|---|
+| `SUPABASE_URL` | URL do projeto Supabase |
+| `SUPABASE_SERVICE_ROLE_KEY` | Secret key (só no servidor) |
+| `ADMIN_TOKEN` | Token para aceder ao `/admin` |
+| `PORT` | Definido automaticamente pelo Railway |
+
+## Correr localmente
 
 ```bash
 npm install
-cp .env.example .env      # no Windows/PowerShell: copy .env.example .env
-# preenche o .env com as tuas chaves
-npm run dev
+cp .env.example .env   # e preencher
+npm run dev            # http://localhost:3000
 ```
 
-Abre http://localhost:3000
+## Base de dados
 
-## 3. Publicar no GitHub
+Tabela `rota_responses` (ver [`supabase/schema.sql`](supabase/schema.sql)). Guarda:
+nome, perfil, pontos de Abertura/Ação (brutos e normalizados) e o array de respostas.
+A pontuação é calculada **no servidor** (fonte única de verdade).
 
-```bash
-git init
-git add .
-git commit -m "Questionário web com Supabase"
-git branch -M main
-git remote add origin https://github.com/<utilizador>/<repo>.git
-git push -u origin main
-```
+## Conteúdo do questionário
 
-> O `.env` está no `.gitignore` — as tuas chaves **não** vão para o GitHub.
-
-## 4. Publicar no Railway
-
-1. Em [railway.app](https://railway.app) → **New Project → Deploy from GitHub repo** e escolhe este repositório.
-2. O Railway deteta o Node automaticamente (`npm install` + `npm start`).
-3. Em **Variables**, adiciona:
-   - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `ADMIN_TOKEN` (uma frase longa à tua escolha)
-   - (`PORT` é definido automaticamente pelo Railway — não precisas de a criar.)
-4. Em **Settings → Networking → Generate Domain** para obteres o link público.
+Todo o conteúdo (sinais, perguntas, opções, ecos, factos, perfis e SWOT) está em
+[`public/quiz-data.js`](public/quiz-data.js) — texto fechado, transcrito à letra.
 
 ## Ver as respostas
 
-- No Supabase: **Table Editor → responses**.
-- Ou via API protegida:
-
-```bash
-curl -H "Authorization: Bearer <ADMIN_TOKEN>" https://<o-teu-dominio>/api/responses
-```
-
-## Adaptar as perguntas
-
-Edita [`questions.js`](questions.js). Tipos suportados: `text`, `email`, `textarea`,
-`rating`, `radio`, `checkbox`. Cada resposta é guardada como JSON na coluna `answers`,
-por isso mudar as perguntas **não exige** alterar a base de dados.
+- **Painel:** abre `/admin` e introduz o `ADMIN_TOKEN`.
+- **Supabase:** Table Editor → `rota_responses`.

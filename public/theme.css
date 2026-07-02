@@ -1,0 +1,136 @@
+/* "A Tua Rota" — sistema visual inCentea Core */
+:root {
+  --bg: #050a13;
+  --bg-1: #0a1220;
+  --bg-2: #0e1826;
+  --card: #0b1421;
+  --line: rgba(166, 206, 57, 0.14);
+  --line-soft: rgba(255, 255, 255, 0.07);
+
+  --lime: #a6ce39;
+  --lime-dim: #7fa02b;
+  --cyan: #4fd8eb;
+  --amber: #ffb454;
+  --slate: #9db2c7;
+
+  --text: #e9f0f7;
+  --muted: #8496a9;
+  --muted-2: #5c6b7d;
+
+  --radius: 18px;
+  --radius-sm: 12px;
+  --maxw: 620px;
+
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-body: "DM Sans", system-ui, sans-serif;
+  --font-mono: "DM Mono", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, rgba(166, 206, 57, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, rgba(79, 216, 235, 0.05), transparent 55%),
+    var(--bg);
+}
+
+::selection { background: var(--lime); color: #05210a; }
+
+/* Etiquetas mono */
+.label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Logo */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand img { height: 26px; width: auto; display: block; }
+.brand .brand-txt {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Botões */
+.btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+  border-radius: 999px;
+  padding: 16px 28px;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: translateY(1px) scale(0.995); }
+
+.btn-primary {
+  background: var(--lime);
+  color: #06230b;
+  box-shadow: 0 10px 30px -10px rgba(166, 206, 57, 0.55);
+}
+.btn-primary:hover { background: #b6de49; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--line-soft);
+}
+.btn-ghost:hover { border-color: var(--lime); color: var(--lime); }
+
+/* Cartão base */
+.card {
+  background: linear-gradient(180deg, var(--bg-1), var(--card));
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius);
+}
+
+/* Rodapé discreto */
+.foot {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-2);
+  text-align: center;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.65; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

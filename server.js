@@ -2,8 +2,8 @@ import "dotenv/config";
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import QRCode from "qrcode";
 import { createClient } from "@supabase/supabase-js";
-import { questionnaire } from "./questions.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -24,103 +24,181 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   process.exit(1);
 }
 
-// O service_role key só vive no servidor — nunca é enviado ao browser.
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false },
 });
 
-const app = express();
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+// --- Pontuação (autoritativa no servidor) -----------------------------------
+// SCORES[pergunta][opção] = [abertura, ação]
+const SCORES = [
+  [[2, 0], [1, 0], [0, 0], [2, 1]], // P1
+  [[1, 3], [0, 2], [0, 1], [0, 0]], // P2
+  [[1, 0], [1, 0], [0, 0], [0, 0]], // P3
+  [[1, 1], [1, 0], [1, 0], [1, 0]], // P4
+  [[2, 2], [2, 1], [1, 0], [0, 0]], // P5
+  [[2, 1], [2, 0], [1, 0], [0, 0]], // P6
+  [[2, 1], [2, 0], [0, 0], [1, 0]], // P7
+  [[0, 0], [1, 0], [1, 0], [2, 1]], // P8
+  [[0, 0], [2, 0], [2, 0], [2, 1]], // P9
+  [[2, 2], [1, 0], [2, 1], [1, 0]], // P10
+];
+const AB_MAX = 17;
+const AC_MAX = 13;
 
-// Devolve a definição do questionário para o frontend construir o formulário.
-app.get("/api/questions", (_req, res) => {
-  res.json(questionnaire);
-});
-
-// Valida uma submissão contra a definição do questionário.
-function validate(answers) {
-  const errors = [];
-  for (const q of questionnaire.questions) {
-    const value = answers[q.id];
-    const isEmpty =
-      value === undefined ||
-      value === null ||
-      value === "" ||
-      (Array.isArray(value) && value.length === 0);
-
-    if (q.required && isEmpty) {
-      errors.push(`A pergunta "${q.label}" é obrigatória.`);
-      continue;
-    }
-    if (isEmpty) continue;
-
-    if (q.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-      errors.push("O email indicado não é válido.");
-    }
-    if (q.type === "rating") {
-      const n = Number(value);
-      if (!Number.isFinite(n) || n < q.min || n > q.max) {
-        errors.push(`A resposta a "${q.label}" está fora do intervalo.`);
-      }
-    }
-    if (q.type === "radio" && !q.options.includes(value)) {
-      errors.push(`Resposta inválida em "${q.label}".`);
-    }
-    if (q.type === "checkbox") {
-      const vals = Array.isArray(value) ? value : [value];
-      if (!vals.every((v) => q.options.includes(v))) {
-        errors.push(`Resposta inválida em "${q.label}".`);
-      }
-    }
-  }
-  return errors;
+function scoreProfile(answers) {
+  let ab = 0;
+  let ac = 0;
+  answers.forEach((opt, i) => {
+    const [a, c] = SCORES[i][opt - 1];
+    ab += a;
+    ac += c;
+  });
+  const abN = ab / AB_MAX;
+  const acN = ac / AC_MAX;
+  let profile;
+  if (abN >= 0.55 && acN >= 0.5) profile = "PIONEIRO";
+  else if (abN >= 0.55 && acN < 0.5) profile = "CURIOSO";
+  else if (abN < 0.55 && acN >= 0.5) profile = "GUARDIAO";
+  else profile = "OBSERVADOR";
+  return { ab, ac, abN, acN, profile };
 }
 
-// Recebe uma submissão e guarda no Supabase.
-app.post("/api/submit", async (req, res) => {
-  const answers = req.body?.answers;
-  if (!answers || typeof answers !== "object") {
-    return res.status(400).json({ error: "Payload inválido." });
+// --- App --------------------------------------------------------------------
+const app = express();
+app.use(express.json());
+
+app.get("/quiz", (_req, res) =>
+  res.sendFile(path.join(__dirname, "public", "quiz.html"))
+);
+app.get("/admin", (_req, res) =>
+  res.sendFile(path.join(__dirname, "public", "admin.html"))
+);
+
+app.use(express.static(path.join(__dirname, "public")));
+
+// QR code (SVG) que aponta para a página do questionário deste mesmo domínio.
+app.get("/api/qr.svg", async (req, res) => {
+  const proto = (req.headers["x-forwarded-proto"] || req.protocol || "https")
+    .split(",")[0]
+    .trim();
+  const host = req.headers["x-forwarded-host"] || req.headers.host;
+  const url = `${proto}://${host}/quiz`;
+  try {
+    const svg = await QRCode.toString(url, {
+      type: "svg",
+      margin: 1,
+      color: { dark: "#050A13", light: "#00000000" },
+    });
+    res.type("image/svg+xml").send(svg);
+  } catch (err) {
+    console.error("Erro a gerar QR:", err);
+    res.status(500).send("Erro a gerar QR.");
+  }
+});
+
+// Devolve o URL público do questionário (para a landing mostrar em texto).
+app.get("/api/quiz-url", (req, res) => {
+  const proto = (req.headers["x-forwarded-proto"] || req.protocol || "https")
+    .split(",")[0]
+    .trim();
+  const host = req.headers["x-forwarded-host"] || req.headers.host;
+  res.json({ url: `${proto}://${host}/quiz` });
+});
+
+// Recebe uma resposta completa e grava-a (com pontuação calculada no servidor).
+app.post("/api/rota/submit", async (req, res) => {
+  const { name, answers } = req.body || {};
+
+  if (typeof name !== "string" || !name.trim()) {
+    return res.status(400).json({ error: "O nome é obrigatório." });
+  }
+  if (
+    !Array.isArray(answers) ||
+    answers.length !== 10 ||
+    !answers.every((n) => Number.isInteger(n) && n >= 1 && n <= 4)
+  ) {
+    return res.status(400).json({ error: "Respostas inválidas." });
   }
 
-  const errors = validate(answers);
-  if (errors.length > 0) {
-    return res.status(400).json({ error: errors.join(" ") });
-  }
+  const { ab, ac, abN, acN, profile } = scoreProfile(answers);
 
-  const { error } = await supabase.from("responses").insert({ answers });
+  const { error } = await supabase.from("rota_responses").insert({
+    name: name.trim().slice(0, 120),
+    profile,
+    ab,
+    ac,
+    ab_n: Number(abN.toFixed(4)),
+    ac_n: Number(acN.toFixed(4)),
+    answers,
+  });
+
   if (error) {
     console.error("Erro ao gravar no Supabase:", error);
     return res.status(500).json({ error: "Não foi possível guardar a resposta." });
   }
 
-  res.status(201).json({ ok: true });
+  res.status(201).json({ ok: true, profile, ab, ac, abN, acN });
 });
 
-// Endpoint de administração para ver as respostas (protegido por token).
-// Ex.: GET /api/responses  com header  "Authorization: Bearer <ADMIN_TOKEN>"
-app.get("/api/responses", async (req, res) => {
-  if (!ADMIN_TOKEN) {
-    return res.status(503).json({ error: "ADMIN_TOKEN não configurado." });
-  }
+// --- Administração (protegida por token) ------------------------------------
+function checkAuth(req) {
+  if (!ADMIN_TOKEN) return false;
   const auth = req.get("authorization") || "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7) : req.query.token;
-  if (token !== ADMIN_TOKEN) {
-    return res.status(401).json({ error: "Não autorizado." });
-  }
+  return token === ADMIN_TOKEN;
+}
+
+app.get("/api/rota/stats", async (req, res) => {
+  if (!checkAuth(req)) return res.status(401).json({ error: "Não autorizado." });
 
   const { data, error } = await supabase
-    .from("responses")
-    .select("*")
+    .from("rota_responses")
+    .select("id, created_at, name, profile, ab, ac, ab_n, ac_n, answers")
     .order("created_at", { ascending: false })
-    .limit(1000);
+    .limit(5000);
 
   if (error) {
     console.error("Erro ao ler do Supabase:", error);
     return res.status(500).json({ error: "Não foi possível ler as respostas." });
   }
-  res.json({ count: data.length, responses: data });
+
+  const total = data.length;
+  const porPerfil = { PIONEIRO: 0, CURIOSO: 0, GUARDIAO: 0, OBSERVADOR: 0 };
+  const perguntas = Array.from({ length: 10 }, () => [0, 0, 0, 0]);
+  let somaAbN = 0;
+  let somaAcN = 0;
+
+  for (const r of data) {
+    if (porPerfil[r.profile] !== undefined) porPerfil[r.profile]++;
+    somaAbN += Number(r.ab_n);
+    somaAcN += Number(r.ac_n);
+    if (Array.isArray(r.answers)) {
+      r.answers.forEach((opt, i) => {
+        if (i < 10 && opt >= 1 && opt <= 4) perguntas[i][opt - 1]++;
+      });
+    }
+  }
+
+  res.json({
+    total,
+    porPerfil,
+    mediaAbN: total ? somaAbN / total : 0,
+    mediaAcN: total ? somaAcN / total : 0,
+    perguntas,
+    pontos: data.map((r) => ({
+      name: r.name,
+      profile: r.profile,
+      abN: Number(r.ab_n),
+      acN: Number(r.ac_n),
+    })),
+    recentes: data.slice(0, 50).map((r) => ({
+      name: r.name,
+      profile: r.profile,
+      abN: Number(r.ab_n),
+      acN: Number(r.ac_n),
+      created_at: r.created_at,
+    })),
+  });
 });
 
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
