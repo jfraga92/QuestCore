@@ -70,25 +70,25 @@
     const S = g.S, P = g.P, W = g.W;
     const dx = P + 0.55 * S, dy = P + 0.5 * S;
     const lbl = (tx, ty, t, c, a) =>
-      `<text x="${tx}" y="${ty}" fill="${c}" font-family="DM Mono, monospace" font-size="11" letter-spacing="1.1" text-anchor="${a}" opacity="0.85">${t}</text>`;
+      `<text x="${tx}" y="${ty}" fill="${c}" font-family="Titillium Web, sans-serif" font-weight="700" font-size="11" letter-spacing="0.6" text-anchor="${a}">${t}</text>`;
     const dots = pontos
       .map((p) => {
         const c = coord(p.abN, p.acN);
         const cor = (DATA.perfis[p.profile] || {}).cor || "#9db2c7";
-        return `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="5" fill="${cor}" fill-opacity="0.55" stroke="${cor}" stroke-opacity="0.9"/>`;
+        return `<circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="5.5" fill="${cor}" fill-opacity="0.7" stroke="#fff" stroke-width="1.2"/>`;
       })
       .join("");
     return `
       <svg class="map" viewBox="0 0 ${W} ${W}" role="img" aria-label="Distribuição de perfis">
-        <rect x="${P}" y="${P}" width="${S}" height="${S}" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.10)" rx="14"/>
-        <line x1="${dx}" y1="${P}" x2="${dx}" y2="${P + S}" stroke="rgba(255,255,255,0.10)" stroke-dasharray="4 5"/>
-        <line x1="${P}" y1="${dy}" x2="${P + S}" y2="${dy}" stroke="rgba(255,255,255,0.10)" stroke-dasharray="4 5"/>
-        ${lbl(P + 10, P + 22, "GUARDIÃO/Ã", "#FFB454", "start")}
-        ${lbl(P + S - 10, P + 22, "PIONEIRO/A", "#A6CE39", "end")}
-        ${lbl(P + 10, P + S - 12, "OBSERVADOR/A", "#9DB2C7", "start")}
-        ${lbl(P + S - 10, P + S - 12, "CURIOSO/A", "#4FD8EB", "end")}
-        ${lbl(P + S / 2, W - 8, "ABERTURA →", "#5c6b7d", "middle")}
-        <g transform="translate(14 ${P + S / 2}) rotate(-90)">${lbl(0, 0, "AÇÃO →", "#5c6b7d", "middle")}</g>
+        <rect x="${P}" y="${P}" width="${S}" height="${S}" fill="#f7faff" stroke="#d7e3f5" rx="14"/>
+        <line x1="${dx}" y1="${P}" x2="${dx}" y2="${P + S}" stroke="#c6d7ee" stroke-dasharray="4 5"/>
+        <line x1="${P}" y1="${dy}" x2="${P + S}" y2="${dy}" stroke="#c6d7ee" stroke-dasharray="4 5"/>
+        ${lbl(P + 10, P + 22, "GUARDIÃO/Ã", "#e08a1e", "start")}
+        ${lbl(P + S - 10, P + 22, "PIONEIRO/A", "#5f9e00", "end")}
+        ${lbl(P + 10, P + S - 12, "OBSERVADOR/A", "#6b7f97", "start")}
+        ${lbl(P + S - 10, P + S - 12, "CURIOSO/A", "#0a97b0", "end")}
+        ${lbl(P + S / 2, W - 8, "ABERTURA →", "#9aa7b6", "middle")}
+        <g transform="translate(14 ${P + S / 2}) rotate(-90)">${lbl(0, 0, "AÇÃO →", "#9aa7b6", "middle")}</g>
         ${dots}
       </svg>`;
   }
@@ -99,14 +99,14 @@
 
     const kpis =
       `<div class="kpi card">
-        <div class="n" style="color:var(--lime)">${total}</div>
+        <div class="n" data-count="${total}" style="color:var(--brand)">0</div>
         <div class="t">Respostas</div>
       </div>` +
       ORDER.map((k) => {
         const p = DATA.perfis[k];
         const n = s.porPerfil[k] || 0;
         return `<div class="kpi card">
-          <div class="n" style="color:${p.cor}">${n}</div>
+          <div class="n" data-count="${n}" style="color:${p.cor}">0</div>
           <div class="t">${p.simbolo} ${esc(p.nome)}</div>
           <div class="pct">${pct(n, total)}%</div>
         </div>`;
@@ -120,7 +120,7 @@
           <span class="name"><span class="sym" style="color:${p.cor}">${p.simbolo}</span>${esc(p.nome)}</span>
           <span class="val">${n} · ${pct(n, total)}%</span>
         </div>
-        <div class="track"><span style="width:${pct(n, total)}%;background:${p.cor}"></span></div>
+        <div class="track"><span data-w="${pct(n, total)}" style="background:${p.cor}"></span></div>
       </div>`;
     }).join("");
 
@@ -134,7 +134,7 @@
         const c = counts[k] || 0;
         return `<div class="o">
           <div class="l"><span>${esc(o.t)}</span><span class="c">${c} · ${pct(c, qTotal)}%</span></div>
-          <div class="tk"><span style="width:${pct(c, qTotal)}%"></span></div>
+          <div class="tk"><span data-w="${pct(c, qTotal)}"></span></div>
         </div>`;
       }).join("");
       return `<div class="qcard card">
@@ -189,8 +189,8 @@
             <div class="distro">${distro}</div>
             <h3 style="margin-top:24px">Médias da equipa</h3>
             <div class="avg">
-              <div class="a"><div class="lab"><span>Abertura</span><b>${abV}/10</b></div><div class="track"><span style="width:${s.mediaAbN * 100}%;background:var(--lime)"></span></div></div>
-              <div class="a"><div class="lab"><span>Ação</span><b style="color:var(--cyan)">${acV}/10</b></div><div class="track"><span style="width:${s.mediaAcN * 100}%;background:var(--cyan)"></span></div></div>
+              <div class="a"><div class="lab"><span>Abertura</span><b>${abV}/10</b></div><div class="track"><span data-w="${s.mediaAbN * 100}" style="background:linear-gradient(90deg,var(--brand-2),var(--brand))"></span></div></div>
+              <div class="a"><div class="lab"><span>Ação</span><b style="color:var(--cyan)">${acV}/10</b></div><div class="track"><span data-w="${s.mediaAcN * 100}" style="background:var(--cyan)"></span></div></div>
             </div>
           </div>
         </div>
@@ -208,6 +208,26 @@
       token = "";
       renderGate();
     };
+
+    // animações: barras crescem, KPIs contam
+    requestAnimationFrame(() => {
+      document.querySelectorAll("[data-w]").forEach((sp) => {
+        sp.style.width = sp.getAttribute("data-w") + "%";
+      });
+      document.querySelectorAll("[data-count]").forEach((el) => {
+        countUp(el, +el.getAttribute("data-count"));
+      });
+    });
+  }
+
+  function countUp(el, target) {
+    const dur = 800, start = performance.now();
+    function step(now) {
+      const p = Math.min(1, (now - start) / dur);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
   }
 
   // ---- arranque -------------------------------------------------------------

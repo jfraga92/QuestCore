@@ -7,163 +7,146 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700;900&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/theme.css" />
     <style>
       .app {
-        max-width: var(--maxw);
-        margin: 0 auto;
-        min-height: 100dvh;
-        display: flex;
-        flex-direction: column;
-        padding: 20px 20px calc(28px + env(safe-area-inset-bottom));
+        max-width: var(--maxw); margin: 0 auto; min-height: 100dvh;
+        display: flex; flex-direction: column;
+        padding: 18px 20px calc(28px + env(safe-area-inset-bottom));
       }
-      .topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 6px 0 14px;
-      }
+      .topbar { display: flex; align-items: center; justify-content: space-between; padding: 4px 0 12px; }
       .screen { flex: 1; display: flex; flex-direction: column; }
       .hidden { display: none !important; }
 
       /* --- Capa --- */
       .cover { justify-content: center; text-align: center; gap: 22px; animation: fadeIn 0.6s ease both; }
       .cover h1 {
-        font-family: var(--font-display);
-        font-weight: 800;
-        font-size: clamp(2.8rem, 15vw, 4.6rem);
-        line-height: 0.92;
-        letter-spacing: -0.02em;
-        margin: 0;
-        background: linear-gradient(180deg, #fff 30%, var(--lime));
+        font-family: var(--font-display); font-weight: 900;
+        font-size: clamp(3rem, 16vw, 5rem); line-height: 0.9; letter-spacing: -0.02em; margin: 0;
+        background: linear-gradient(100deg, var(--brand-deep), var(--brand) 45%, var(--brand-2));
         -webkit-background-clip: text; background-clip: text; color: transparent;
+        animation: fadeUp 0.7s ease both;
       }
-      .cover p { color: var(--muted); font-size: 1.05rem; line-height: 1.55; margin: 0; }
-      .cover p strong { color: var(--text); }
+      .cover p { color: var(--text); font-size: 1.06rem; line-height: 1.6; margin: 0; animation: fadeUp 0.7s ease 0.1s both; }
+      .cover p.lead { color: var(--muted); }
+      .cover p strong { color: var(--brand); font-weight: 700; }
       .cover .note {
-        font-family: var(--font-mono);
-        font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
-        color: var(--muted-2);
+        font-family: var(--font-mono); font-weight: 700; font-size: 0.72rem;
+        letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted-2);
+        animation: fadeUp 0.7s ease 0.2s both;
       }
-      .cover .cta { margin-top: 6px; }
+      .cover .cta { margin-top: 6px; animation: popIn 0.6s ease 0.3s both; }
 
       /* --- Nome --- */
-      .name-screen { justify-content: center; gap: 18px; animation: fadeIn 0.5s ease both; }
-      .name-screen h2 {
-        font-family: var(--font-display); font-weight: 700;
-        font-size: 2rem; margin: 0; letter-spacing: -0.01em;
-      }
+      .name-screen { justify-content: center; gap: 16px; animation: fadeIn 0.5s ease both; }
+      .name-screen h2 { font-family: var(--font-display); font-weight: 700; font-size: 2.1rem; margin: 0; color: var(--ink); letter-spacing: -0.01em; }
       .name-screen input {
-        width: 100%; padding: 18px 20px; font-size: 1.15rem; font-family: var(--font-body);
-        color: var(--text); background: var(--bg-1);
-        border: 1.5px solid var(--line-soft); border-radius: 14px; outline: none;
-        transition: border-color 0.15s;
+        width: 100%; padding: 18px 20px; font-size: 1.15rem; font-family: var(--font-body); font-weight: 600;
+        color: var(--ink); background: #fff; border: 1.5px solid var(--line-soft); border-radius: 14px;
+        outline: none; transition: border-color 0.15s, box-shadow 0.15s; box-shadow: var(--shadow-sm);
       }
-      .name-screen input:focus { border-color: var(--lime); }
-      .name-hint { color: var(--muted-2); font-size: 0.85rem; }
+      .name-screen input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(1,104,255,0.12); }
+      .name-hint { color: var(--muted); font-size: 0.88rem; }
 
       /* --- Progresso --- */
       .progress { display: flex; align-items: center; gap: 12px; }
-      .progress .bar { flex: 1; height: 4px; background: var(--line-soft); border-radius: 99px; overflow: hidden; }
-      .progress .bar > span { display: block; height: 100%; background: var(--lime); border-radius: 99px; transition: width 0.4s ease; }
+      .progress .bar { flex: 1; height: 6px; background: var(--line-soft); border-radius: 99px; overflow: hidden; }
+      .progress .bar > span { display: block; height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--brand-2), var(--brand)); transition: width 0.5s cubic-bezier(.3,.8,.3,1); }
 
       /* --- Pergunta --- */
-      .q { gap: 18px; padding-top: 8px; animation: fadeUp 0.4s ease both; }
+      .q { gap: 18px; padding-top: 6px; animation: fadeUp 0.42s ease both; }
       .sinal {
-        position: relative;
-        background: linear-gradient(140deg, rgba(166,206,57,0.10), rgba(79,216,235,0.04));
-        border: 1px solid var(--line);
-        border-radius: var(--radius);
-        padding: 20px 20px 20px 22px;
+        position: relative; background: linear-gradient(135deg, #fff, var(--bg-1));
+        border: 1px solid var(--line); border-radius: var(--radius);
+        padding: 20px 20px 20px 24px; box-shadow: var(--shadow-sm); overflow: hidden;
       }
-      .sinal::before {
-        content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px;
-        background: var(--lime); border-radius: 99px;
+      .sinal::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 4px; background: linear-gradient(var(--brand-2), var(--brand)); border-radius: 99px; }
+      .sinal::after {
+        content: ""; position: absolute; right: -30px; top: -30px; width: 120px; height: 132px;
+        background: radial-gradient(closest-side, rgba(1,104,255,0.10), transparent);
+        clip-path: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
       }
-      .sinal .k { color: var(--lime); }
-      .sinal p { margin: 8px 0 0; font-size: 1.06rem; line-height: 1.5; color: #dbe7d2; }
-      .pergunta { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; line-height: 1.3; margin: 2px 0; }
+      .sinal .k { color: var(--brand); }
+      .sinal p { margin: 8px 0 0; font-size: 1.08rem; line-height: 1.5; color: var(--ink); font-weight: 600; }
+      .pergunta { font-family: var(--font-display); font-weight: 700; font-size: 1.42rem; line-height: 1.3; margin: 2px 0; color: var(--ink); }
 
       .opts { display: flex; flex-direction: column; gap: 10px; }
       .opt {
-        text-align: left; width: 100%;
-        background: var(--bg-1); color: var(--text);
-        border: 1.5px solid var(--line-soft); border-radius: 14px;
-        padding: 16px 18px; font-size: 1.02rem; line-height: 1.35; font-family: var(--font-body);
-        cursor: pointer; transition: border-color 0.15s, background 0.15s, opacity 0.25s, transform 0.1s;
-        display: flex; align-items: center; gap: 14px;
+        text-align: left; width: 100%; background: #fff; color: var(--text);
+        border: 1.5px solid var(--line-soft); border-radius: 14px; padding: 16px 18px;
+        font-size: 1.02rem; line-height: 1.35; font-family: var(--font-body); font-weight: 600;
+        cursor: pointer; display: flex; align-items: center; gap: 14px; box-shadow: var(--shadow-sm);
+        transition: border-color 0.15s, background 0.15s, opacity 0.3s, transform 0.12s, box-shadow 0.2s;
+        animation: riseStagger 0.42s ease both;
       }
-      .opt .dot {
-        flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%;
-        border: 2px solid var(--muted-2); transition: all 0.15s;
-      }
-      .opt:hover { border-color: var(--lime); }
+      .opt:nth-child(1) { animation-delay: 0.05s; }
+      .opt:nth-child(2) { animation-delay: 0.11s; }
+      .opt:nth-child(3) { animation-delay: 0.17s; }
+      .opt:nth-child(4) { animation-delay: 0.23s; }
+      .opt .dot { flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--muted-2); transition: all 0.15s; position: relative; }
+      .opt:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: 0 12px 26px -14px rgba(1,104,255,0.5); }
       .opt:active { transform: scale(0.99); }
-      .opts.answered .opt { opacity: 0.32; pointer-events: none; }
-      .opts.answered .opt.sel { opacity: 1; border-color: var(--lime); background: rgba(166,206,57,0.08); }
-      .opt.sel .dot { border-color: var(--lime); background: var(--lime); box-shadow: 0 0 0 4px rgba(166,206,57,0.18); }
+      .opts.answered .opt { opacity: 0.4; pointer-events: none; transform: scale(0.99); }
+      .opts.answered .opt.sel { opacity: 1; border-color: var(--brand); background: linear-gradient(135deg, #fff, var(--bg-2)); transform: none; box-shadow: var(--shadow-brand); }
+      .opt.sel .dot { border-color: var(--brand); background: var(--brand); }
+      .opt.sel .dot::after { content: "✓"; position: absolute; inset: 0; color: #fff; font-size: 0.8rem; display: grid; place-items: center; font-weight: 700; }
 
       /* --- Painel eco + facto --- */
-      .panel {
-        margin-top: 4px; border-radius: var(--radius);
-        border: 1px solid var(--line); overflow: hidden;
-        animation: fadeUp 0.35s ease both;
-      }
-      .eco { padding: 18px 20px; background: rgba(166,206,57,0.06); }
-      .eco .k { color: var(--lime); }
-      .eco p { margin: 6px 0 0; font-size: 1.08rem; line-height: 1.45; }
-      .facto { padding: 16px 20px; background: var(--bg-2); border-top: 1px dashed var(--line); }
+      .panel { margin-top: 4px; border-radius: var(--radius); border: 1px solid var(--line); overflow: hidden; box-shadow: var(--shadow); animation: fadeUp 0.4s ease both; }
+      .eco { padding: 18px 20px; background: linear-gradient(135deg, var(--bg-2), #fff); }
+      .eco .k { color: var(--brand); }
+      .eco p { margin: 6px 0 0; font-size: 1.1rem; line-height: 1.45; color: var(--ink); font-weight: 600; }
+      .facto { padding: 16px 20px; background: #fff; border-top: 1px dashed var(--line); }
       .facto .tag {
-        display: inline-block; font-family: var(--font-mono); font-size: 0.66rem;
-        letter-spacing: 0.16em; color: var(--cyan);
-        border: 1px solid rgba(79,216,235,0.4); border-radius: 6px; padding: 3px 8px;
+        display: inline-block; font-family: var(--font-mono); font-weight: 700; font-size: 0.66rem;
+        letter-spacing: 0.16em; color: #fff; background: var(--cyan); border-radius: 6px; padding: 3px 9px;
       }
-      .facto p { margin: 8px 0 0; font-size: 0.96rem; line-height: 1.45; color: var(--slate); }
-      .continue { margin-top: 16px; }
+      .facto p { margin: 9px 0 0; font-size: 0.98rem; line-height: 1.45; color: var(--text); }
+      .continue { margin-top: 16px; animation: fadeUp 0.4s ease 0.1s both; }
       .continue .btn { width: 100%; }
 
       /* --- Ecrã final --- */
-      .final { gap: 26px; padding-top: 8px; animation: fadeIn 0.6s ease both; }
-      .result-head { text-align: center; }
-      .result-head .sym { font-size: 2.6rem; line-height: 1; }
-      .result-head .pname {
-        font-family: var(--font-display); font-weight: 800;
-        font-size: clamp(2.4rem, 12vw, 3.4rem); margin: 8px 0 0; letter-spacing: -0.01em;
-      }
-      .result-head .pdesc { color: var(--muted); font-size: 1.05rem; line-height: 1.5; margin: 12px auto 0; max-width: 460px; }
+      .final { gap: 26px; padding-top: 6px; animation: fadeIn 0.6s ease both; }
+      .result-head { text-align: center; padding: 26px 18px; border-radius: var(--radius); background: linear-gradient(160deg, var(--navy), #0b2d63); color: #fff; box-shadow: var(--shadow); position: relative; overflow: hidden; }
+      .result-head::after { content: ""; position: absolute; inset: 0; background: radial-gradient(closest-side, rgba(46,169,255,0.35), transparent 70%) 80% -20%/60% 60% no-repeat; }
+      .result-head .label { color: rgba(255,255,255,0.7); }
+      .result-head .sym { font-size: 3rem; line-height: 1; animation: popIn 0.6s ease 0.15s both; }
+      .result-head .pname { font-family: var(--font-display); font-weight: 900; font-size: clamp(2.6rem, 13vw, 3.6rem); margin: 6px 0 0; letter-spacing: -0.01em; animation: fadeUp 0.6s ease 0.2s both; }
+      .result-head .pdesc { color: rgba(255,255,255,0.85); font-size: 1.05rem; line-height: 1.5; margin: 12px auto 0; max-width: 460px; animation: fadeUp 0.6s ease 0.3s both; }
 
-      .block-title { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+      .block-title { font-family: var(--font-mono); font-weight: 700; font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--brand); margin-bottom: 12px; }
 
-      .map-wrap { padding: 18px; }
+      .map-wrap { padding: 16px; }
       .map { width: 100%; height: auto; display: block; }
 
-      .axes .axis { margin-bottom: 14px; }
+      .axes { padding: 20px; }
+      .axes .axis { margin-bottom: 16px; }
       .axes .axis:last-child { margin-bottom: 0; }
-      .axes .axis .row { display: flex; justify-content: space-between; font-size: 0.95rem; margin-bottom: 7px; }
-      .axes .axis .row .v { font-family: var(--font-mono); color: var(--lime); }
-      .axes .track { height: 8px; background: var(--line-soft); border-radius: 99px; overflow: hidden; }
-      .axes .track > span { display: block; height: 100%; border-radius: 99px; transition: width 0.8s cubic-bezier(.2,.7,.2,1); }
+      .axes .axis .row { display: flex; justify-content: space-between; font-size: 0.98rem; margin-bottom: 8px; font-weight: 600; color: var(--ink); }
+      .axes .axis .row .v { font-family: var(--font-mono); font-weight: 700; color: var(--brand); }
+      .axes .track { height: 10px; background: var(--line-soft); border-radius: 99px; overflow: hidden; }
+      .axes .track > span { display: block; height: 100%; border-radius: 99px; width: 0; transition: width 1s cubic-bezier(.2,.8,.2,1); }
 
       .swot { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-      .swot .quad { padding: 16px; border-radius: 14px; border: 1px solid var(--line-soft); background: var(--bg-1); }
-      .swot .quad h4 { margin: 0 0 10px; font-size: 0.82rem; font-family: var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
-      .swot .quad.s h4 { color: var(--lime); }
-      .swot .quad.w h4 { color: var(--amber); }
-      .swot .quad.o h4 { color: var(--cyan); }
-      .swot .quad.t h4 { color: #ff7a7a; }
+      .swot .quad { padding: 16px; border-radius: 14px; border: 1px solid var(--line-soft); background: #fff; box-shadow: var(--shadow-sm); animation: riseStagger 0.5s ease both; }
+      .swot .quad:nth-child(1) { animation-delay: 0.05s; } .swot .quad:nth-child(2) { animation-delay: 0.12s; }
+      .swot .quad:nth-child(3) { animation-delay: 0.19s; } .swot .quad:nth-child(4) { animation-delay: 0.26s; }
+      .swot .quad h4 { margin: 0 0 10px; font-size: 0.8rem; font-family: var(--font-mono); font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+      .swot .quad.s h4 { color: #16a34a; } .swot .quad.w h4 { color: var(--amber); }
+      .swot .quad.o h4 { color: var(--brand); } .swot .quad.t h4 { color: #ef4444; }
       .swot .quad ul { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 8px; }
-      .swot .quad li { font-size: 0.9rem; line-height: 1.35; color: #d3dde8; }
+      .swot .quad li { font-size: 0.9rem; line-height: 1.35; color: var(--text); }
       @media (max-width: 460px) { .swot { grid-template-columns: 1fr; } }
 
-      .next-step { padding: 20px; border-radius: var(--radius); border: 1px solid var(--line); background: linear-gradient(140deg, rgba(166,206,57,0.10), transparent); }
-      .next-step p { margin: 8px 0 0; font-size: 1.06rem; line-height: 1.5; }
-      .next-step p strong { color: var(--lime); font-weight: 600; }
+      .next-step { padding: 20px; border-radius: var(--radius); border: 1px solid var(--line); background: linear-gradient(135deg, var(--bg-2), #fff); box-shadow: var(--shadow-sm); }
+      .next-step p { margin: 8px 0 0; font-size: 1.08rem; line-height: 1.5; color: var(--ink); }
+      .next-step p strong { color: var(--brand); font-weight: 700; }
 
-      .closing { text-align: center; font-family: var(--font-display); font-weight: 600; font-size: 1.3rem; line-height: 1.35; padding: 6px 0; }
-      .closing strong { color: var(--lime); }
+      .closing { text-align: center; font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; line-height: 1.35; padding: 6px 0; color: var(--ink); }
+      .closing strong { color: var(--brand); }
 
       .final-actions { display: flex; flex-direction: column; gap: 10px; }
       .final-actions .btn { width: 100%; }
@@ -171,26 +154,18 @@
       .row-actions .btn { flex: 1; }
 
       /* --- Modo Sala --- */
-      .sala {
-        position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column;
-        align-items: center; justify-content: center; gap: 18px; text-align: center;
-        animation: fadeIn 0.4s ease both; cursor: pointer;
-      }
-      .sala .sym { font-size: 30vw; line-height: 1; }
-      .sala .pname { font-family: var(--font-display); font-weight: 800; font-size: 12vw; letter-spacing: -0.01em; }
-      .sala .hint { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.7; }
+      .sala { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; text-align: center; animation: fadeIn 0.4s ease both; cursor: pointer; }
+      .sala .sym { font-size: 30vw; line-height: 1; animation: popIn 0.5s ease both; }
+      .sala .pname { font-family: var(--font-display); font-weight: 900; font-size: 12vw; letter-spacing: -0.01em; }
+      .sala .hint { font-family: var(--font-mono); font-weight: 600; font-size: 0.82rem; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.8; }
     </style>
   </head>
   <body>
     <div class="app">
       <div class="topbar">
-        <div class="brand">
-          <img src="/logo.webp" alt="inCentea Core" />
-          <span class="brand-txt">A Tua Rota</span>
-        </div>
+        <div class="brand"><img src="/logo.webp" alt="inCentea Core" /></div>
         <div class="label" id="counter"></div>
       </div>
-
       <div id="stage" class="screen"></div>
     </div>
 

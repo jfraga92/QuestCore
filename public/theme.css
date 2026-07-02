@@ -1,36 +1,48 @@
-/* "A Tua Rota" — sistema visual inCentea Core */
+/* "A Tua Rota" — sistema visual inCentea Core (claro · azul · Titillium Web) */
 :root {
-  --bg: #050a13;
-  --bg-1: #0a1220;
-  --bg-2: #0e1826;
-  --card: #0b1421;
-  --line: rgba(166, 206, 57, 0.14);
-  --line-soft: rgba(255, 255, 255, 0.07);
+  /* superfícies */
+  --bg: #ffffff;
+  --bg-1: #f4f8ff;      /* painel suave */
+  --bg-2: #e9f1ff;      /* realce */
+  --card: #ffffff;
+  --navy: #071a33;      /* seções dramáticas / modo sala */
 
-  --lime: #a6ce39;
-  --lime-dim: #7fa02b;
-  --cyan: #4fd8eb;
-  --amber: #ffb454;
-  --slate: #9db2c7;
+  /* traços */
+  --line: rgba(1, 104, 255, 0.16);
+  --line-soft: #e2e9f4;
 
-  --text: #e9f0f7;
-  --muted: #8496a9;
-  --muted-2: #5c6b7d;
+  /* marca */
+  --brand: #0168ff;     /* azul inCentea */
+  --brand-2: #2ea9ff;   /* azul claro (logo "ínCentea") */
+  --brand-deep: #0b43b8;
+  --lime: #0168ff;      /* alias p/ compatibilidade (acento primário) */
+  --cyan: #17c0e9;      /* eixo Ação */
+  --amber: #ff9f1c;
+  --slate: #7b8ca6;
 
-  --radius: 18px;
-  --radius-sm: 12px;
+  /* texto */
+  --ink: #16233a;       /* títulos */
+  --text: #253349;      /* corpo */
+  --muted: #77838f;     /* secundário */
+  --muted-2: #9aa7b6;
+
+  --radius: 20px;
+  --radius-sm: 13px;
   --maxw: 620px;
 
-  --font-display: "Syne", system-ui, sans-serif;
-  --font-body: "DM Sans", system-ui, sans-serif;
-  --font-mono: "DM Mono", ui-monospace, monospace;
+  --font-display: "Titillium Web", system-ui, sans-serif;
+  --font-body: "Titillium Web", system-ui, sans-serif;
+  --font-mono: "Titillium Web", system-ui, sans-serif;
+
+  --shadow-sm: 0 4px 18px -8px rgba(11, 43, 93, 0.18);
+  --shadow: 0 20px 50px -24px rgba(7, 40, 110, 0.35);
+  --shadow-brand: 0 18px 40px -14px rgba(1, 104, 255, 0.5);
 }
 
 * { box-sizing: border-box; }
 
 html, body {
-  margin: 0;
-  padding: 0;
+  margin: 0; padding: 0;
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
@@ -38,99 +50,120 @@ html, body {
   text-rendering: optimizeLegibility;
 }
 
-body {
-  min-height: 100dvh;
+body { min-height: 100dvh; position: relative; overflow-x: hidden; }
+
+/* Fundo animado: blobs azuis que derivam + grelha ténue */
+body::before {
+  content: "";
+  position: fixed; inset: -20% -10% -10% -10%;
+  z-index: -2;
   background:
-    radial-gradient(1200px 600px at 50% -10%, rgba(166, 206, 57, 0.08), transparent 60%),
-    radial-gradient(900px 500px at 100% 100%, rgba(79, 216, 235, 0.05), transparent 55%),
-    var(--bg);
+    radial-gradient(closest-side, rgba(1, 104, 255, 0.16), transparent 70%) 12% 18% / 46vw 46vw no-repeat,
+    radial-gradient(closest-side, rgba(46, 169, 255, 0.14), transparent 70%) 88% 30% / 40vw 40vw no-repeat,
+    radial-gradient(closest-side, rgba(23, 192, 233, 0.10), transparent 70%) 60% 92% / 44vw 44vw no-repeat;
+  filter: blur(10px);
+  animation: drift 24s ease-in-out infinite alternate;
+}
+body::after {
+  content: "";
+  position: fixed; inset: 0; z-index: -1;
+  background-image:
+    linear-gradient(rgba(1, 104, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(1, 104, 255, 0.035) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at 50% 40%, #000 30%, transparent 80%);
 }
 
-::selection { background: var(--lime); color: #05210a; }
+::selection { background: var(--brand); color: #fff; }
 
-/* Etiquetas mono */
+/* Etiquetas */
 .label {
   font-family: var(--font-mono);
+  font-weight: 700;
   font-size: 0.72rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--brand);
 }
 
 /* Logo */
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.brand img { height: 26px; width: auto; display: block; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand img { height: 30px; width: auto; display: block; }
 .brand .brand-txt {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font-family: var(--font-mono); font-weight: 700;
+  font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--muted);
 }
 
 /* Botões */
 .btn {
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 1rem;
-  border: none;
-  border-radius: 999px;
-  padding: 16px 28px;
-  cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.2s ease, background 0.2s ease;
-  -webkit-tap-highlight-color: transparent;
+  font-family: var(--font-body); font-weight: 700; font-size: 1.02rem;
+  border: none; border-radius: 999px; padding: 16px 30px; cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.2s ease, filter 0.2s;
+  -webkit-tap-highlight-color: transparent; letter-spacing: 0.01em;
 }
-.btn:active { transform: translateY(1px) scale(0.995); }
+.btn:active { transform: translateY(1px) scale(0.99); }
 
 .btn-primary {
-  background: var(--lime);
-  color: #06230b;
-  box-shadow: 0 10px 30px -10px rgba(166, 206, 57, 0.55);
+  color: #fff;
+  background: linear-gradient(135deg, var(--brand-2), var(--brand));
+  box-shadow: var(--shadow-brand);
+  position: relative; overflow: hidden;
 }
-.btn-primary:hover { background: #b6de49; }
+.btn-primary::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.45) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: sheen 3.4s ease-in-out infinite;
+}
+.btn-primary:hover { filter: brightness(1.06); transform: translateY(-2px); }
 
 .btn-ghost {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid var(--line-soft);
+  background: #fff; color: var(--brand);
+  border: 1.5px solid var(--line); box-shadow: var(--shadow-sm);
 }
-.btn-ghost:hover { border-color: var(--lime); color: var(--lime); }
+.btn-ghost:hover { border-color: var(--brand); transform: translateY(-2px); }
 
-/* Cartão base */
+/* Cartão */
 .card {
-  background: linear-gradient(180deg, var(--bg-1), var(--card));
+  background: var(--card);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
 }
 
-/* Rodapé discreto */
+/* Rodapé */
 .foot {
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--muted-2);
-  text-align: center;
+  font-family: var(--font-mono); font-weight: 600;
+  font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--muted-2); text-align: center;
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Hexágono decorativo (motivo inCentea) */
+.hex {
+  clip-path: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
 }
+
+/* ---- biblioteca de animações ---- */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.35); opacity: 0.65; }
+@keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 60% { transform: scale(1.04); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes drift {
+  0% { transform: translate3d(0,0,0) scale(1); }
+  50% { transform: translate3d(-3%, 2%, 0) scale(1.08); }
+  100% { transform: translate3d(2%, -2%, 0) scale(1.02); }
 }
+@keyframes sheen { 0% { transform: translateX(-120%); } 55%, 100% { transform: translateX(120%); } }
+@keyframes floatY { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes ring { 0% { transform: scale(0.6); opacity: 0.6; } 100% { transform: scale(1.8); opacity: 0; } }
+@keyframes spinHex { to { transform: rotate(360deg); } }
+@keyframes riseStagger { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
+    transition-duration: 0.01ms !important;
   }
+  body::before { animation: none !important; }
 }

@@ -66,7 +66,7 @@
       <div class="screen cover">
         <h1>A TUA ROTA</h1>
         <p>A inCentea Core está a traçar a sua rota para a era da IA. E há uma coisa que nenhum plano, por melhor que seja, consegue garantir: <strong>o teu lugar nela</strong>. Esse, só tu o defines.</p>
-        <p>10 sinais do terreno. 10 escolhas tuas. No fim: o teu lugar no mapa, com a tua SWOT pessoal.</p>
+        <p class="lead">10 sinais do terreno. 10 escolhas tuas. No fim: o teu lugar no mapa, com a tua SWOT pessoal.</p>
         <div class="note">sem respostas certas · uso interno inCentea Core</div>
         <div class="cta"><button class="btn btn-primary" id="start">Começar</button></div>
       </div>`,
@@ -228,27 +228,21 @@
       `<text x="${tx}" y="${ty}" fill="${c}" font-family="DM Mono, monospace" font-size="11" letter-spacing="1.2" text-anchor="${anchor}" opacity="0.85">${t}</text>`;
     return `
     <svg class="map" viewBox="0 0 ${W} ${W}" role="img" aria-label="Mapa de perfis">
-      <rect x="${P}" y="${P}" width="${S}" height="${S}" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,0.10)" rx="14"/>
-      <line x1="${dx}" y1="${P}" x2="${dx}" y2="${P + S}" stroke="rgba(255,255,255,0.10)" stroke-dasharray="4 5"/>
-      <line x1="${P}" y1="${dy}" x2="${P + S}" y2="${dy}" stroke="rgba(255,255,255,0.10)" stroke-dasharray="4 5"/>
-      ${lbl(P + 10, P + 22, "GUARDIÃO/Ã", "#FFB454", "start")}
-      ${lbl(P + S - 10, P + 22, "PIONEIRO/A", "#A6CE39", "end")}
-      ${lbl(P + 10, P + S - 12, "OBSERVADOR/A", "#9DB2C7", "start")}
-      ${lbl(P + S - 10, P + S - 12, "CURIOSO/A", "#4FD8EB", "end")}
-      ${lbl(P + S / 2, W - 8, "ABERTURA →", "#5c6b7d", "middle")}
-      <g transform="translate(14 ${P + S / 2}) rotate(-90)">${lbl(
-      0,
-      0,
-      "AÇÃO →",
-      "#5c6b7d",
-      "middle"
-    )}</g>
+      <rect x="${P}" y="${P}" width="${S}" height="${S}" fill="#f7faff" stroke="#d7e3f5" rx="14"/>
+      <line x1="${dx}" y1="${P}" x2="${dx}" y2="${P + S}" stroke="#c6d7ee" stroke-dasharray="4 5"/>
+      <line x1="${P}" y1="${dy}" x2="${P + S}" y2="${dy}" stroke="#c6d7ee" stroke-dasharray="4 5"/>
+      ${lbl(P + 10, P + 22, "GUARDIÃO/Ã", "#e08a1e", "start")}
+      ${lbl(P + S - 10, P + 22, "PIONEIRO/A", "#5f9e00", "end")}
+      ${lbl(P + 10, P + S - 12, "OBSERVADOR/A", "#6b7f97", "start")}
+      ${lbl(P + S - 10, P + S - 12, "CURIOSO/A", "#0a97b0", "end")}
+      ${lbl(P + S / 2, W - 8, "ABERTURA →", "#9aa7b6", "middle")}
+      <g transform="translate(14 ${P + S / 2}) rotate(-90)">${lbl(0, 0, "AÇÃO →", "#9aa7b6", "middle")}</g>
       <circle cx="${px}" cy="${py}" r="16" fill="${cor}" opacity="0.28">
-        <animate attributeName="r" values="12;22;12" dur="2.4s" repeatCount="indefinite"/>
-        <animate attributeName="opacity" values="0.35;0.05;0.35" dur="2.4s" repeatCount="indefinite"/>
+        <animate attributeName="r" values="12;24;12" dur="2.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.4;0.05;0.4" dur="2.4s" repeatCount="indefinite"/>
       </circle>
-      <circle cx="${px}" cy="${py}" r="7" fill="${cor}" stroke="#050a13" stroke-width="2"/>
-      <text x="${px}" y="${py - 18}" fill="${cor}" font-family="DM Mono, monospace" font-size="11" text-anchor="middle" font-weight="500">estás aqui</text>
+      <circle cx="${px}" cy="${py}" r="7.5" fill="${cor}" stroke="#fff" stroke-width="2.5"/>
+      <text x="${px}" y="${py - 18}" fill="${cor}" font-family="Titillium Web, sans-serif" font-weight="700" font-size="12" text-anchor="middle">estás aqui</text>
     </svg>`;
   }
 
@@ -278,14 +272,14 @@
 
         <div>
           <div class="block-title">Os teus eixos</div>
-          <div class="axes card" style="padding:18px">
+          <div class="axes card">
             <div class="axis">
-              <div class="row"><span>Abertura</span><span class="v">${abV}/10</span></div>
-              <div class="track"><span style="width:${r.abN * 100}%;background:var(--lime)"></span></div>
+              <div class="row"><span>Abertura</span><span class="v" id="val-ab">0/10</span></div>
+              <div class="track"><span id="bar-ab" style="background:linear-gradient(90deg,var(--brand-2),var(--brand))"></span></div>
             </div>
             <div class="axis">
-              <div class="row"><span>Ação</span><span class="v" style="color:var(--cyan)">${acV}/10</span></div>
-              <div class="track"><span style="width:${r.acN * 100}%;background:var(--cyan)"></span></div>
+              <div class="row"><span>Ação</span><span class="v" id="val-ac" style="color:var(--cyan)">0/10</span></div>
+              <div class="track"><span id="bar-ac" style="background:var(--cyan)"></span></div>
             </div>
           </div>
         </div>
@@ -329,6 +323,28 @@
     };
     document.getElementById("sala-btn").onclick = () => openSala(r);
     document.getElementById("share-btn").onclick = () => share(r);
+
+    // animação: barras crescem de 0 e números contam
+    requestAnimationFrame(() => {
+      const ab = document.getElementById("bar-ab");
+      const ac = document.getElementById("bar-ac");
+      if (ab) ab.style.width = r.abN * 100 + "%";
+      if (ac) ac.style.width = r.acN * 100 + "%";
+      countUp(document.getElementById("val-ab"), abV);
+      countUp(document.getElementById("val-ac"), acV);
+    });
+  }
+
+  function countUp(el, target) {
+    if (!el) return;
+    const dur = 900;
+    const start = performance.now();
+    function step(now) {
+      const p = Math.min(1, (now - start) / dur);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3))) + "/10";
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
   }
 
   // ---- Modo Sala ------------------------------------------------------------
