@@ -7,12 +7,14 @@ import { questionnaire } from "./questions.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const {
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY,
-  ADMIN_TOKEN,
-  PORT = 3000,
-} = process.env;
+// Limpa espaços e quebras de linha acidentais (ex.: ao colar as chaves no
+// painel do Railway) — headers HTTP não podem conter estes caracteres.
+const clean = (v) => (v ? v.replace(/\s+/g, "") : v);
+
+const SUPABASE_URL = clean(process.env.SUPABASE_URL);
+const SUPABASE_SERVICE_ROLE_KEY = clean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN?.trim();
+const PORT = process.env.PORT || 3000;
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
   console.error(
@@ -90,12 +92,7 @@ app.post("/api/submit", async (req, res) => {
   const { error } = await supabase.from("responses").insert({ answers });
   if (error) {
     console.error("Erro ao gravar no Supabase:", error);
-    return res.status(500).json({
-      error: "Não foi possível guardar a resposta.",
-      detail: error.message,
-      code: error.code,
-      hint: error.hint,
-    });
+    return res.status(500).json({ error: "Não foi possível guardar a resposta." });
   }
 
   res.status(201).json({ ok: true });
