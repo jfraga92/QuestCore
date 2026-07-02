@@ -90,7 +90,12 @@ app.post("/api/submit", async (req, res) => {
   const { error } = await supabase.from("responses").insert({ answers });
   if (error) {
     console.error("Erro ao gravar no Supabase:", error);
-    return res.status(500).json({ error: "Não foi possível guardar a resposta." });
+    return res.status(500).json({
+      error: "Não foi possível guardar a resposta.",
+      detail: error.message,
+      code: error.code,
+      hint: error.hint,
+    });
   }
 
   res.status(201).json({ ok: true });
